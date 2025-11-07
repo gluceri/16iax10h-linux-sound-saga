@@ -1,24 +1,25 @@
-# Nadim's ~~sad~~ epic, noble, valiant quest to fix his laptop speakers
+# $800 Bug Bounty to Whoever Fixes the Lenovo Legion Pro 7 16IAX10H's Speakers on Linux
 
-![](george.jpg)
-
-The internal speakers don't work on my Linux laptop. Join me as I publicly fail to do anything about this.
-
-To be more precise: the speakers sound *absolutely phenomenal* if your definition of "phenomenal" is "like listening to music through a tin can filled with angry bees from the year 1997." The audio is so tinny and muffled that I'm pretty sure only the tweeters decided to show up for work today. Want to listen to your favorite song? Great! Now imagine it being performed by chipmunks trapped inside a shoebox. That's the experience.
-
-## Do we have a solution?
-
-No.
+We are a bunch of Linux users with the Lenovo Legion Pro 7 (16IAX10H) and we are **sick and tired** of our speakers not working properly. We also suck at writing Linux kernel audio drivers, especially when weird things like "Awinic smart amplifiers" are involved. **If you help us make sure that Linux has support for audio on our laptops, we will send you a lot of money.**
 
 ## What is the problem?
 
 The internal speakers on my Lenovo Legion Pro 7 16IAX10H (and several other Lenovo laptops with the Realtek ALC3306 codec) produce extremely low volume audio that sounds tinny and muffled - as if only the tweeters are working, not the woofers.
 
+## Bug bounty pledges
+
+The following individuals pledge the following amount to the bug bounty, to be paid in full to whoever fixes this bug:
+
+- **$500 USD** pledged by @kaepora (me, organizer of this effort)
+- **$200 USD** [pledged](https://github.com/nadimkobeissi/16iax10h-linux-sound-saga/issues/1) by @Detritalgeo
+- **$100 USD** [pledged](https://github.com/nadimkobeissi/16iax10h-linux-sound-saga/issues/2) by @cerroverb
+- **? USD** [pledged](https://github.com/nadimkobeissi/16iax10h-linux-sound-saga/issues/4) by @atlasfoo
+
+**Want to add an amount to the pledge? Please send in a pull request!**
+
 ### What's actually happening (I think)
 
 The laptop has a **Realtek ALC3306** codec (according to official Lenovo specs), but Linux incorrectly detects it as an **ALC287** with subsystem ID `17aa:3906`. The kernel driver applies a generic fallback fixup instead of a device-specific one, which causes the woofer/bass speakers to not be driven properly.
-
-### Root cause
 
 After investigation, it turns out the Legion Pro 7 16IAX10H uses **Awinic AWDZ8399 smart amplifiers** (at I2C addresses 0x34 and 0x35 on i2c-2). While a kernel driver exists (`snd_soc_aw88399`) and loads correctly, there's no integration between the codec and the amplifiers in the audio pipeline.
 
@@ -28,21 +29,8 @@ Specifically:
 - The required topology file (something like `sof-arl-alc287-aw88399.tplg`) doesn't exist in the SOF firmware package
 - No ACPI/DMI quirk exists for subsystem ID `17aa:3906` to properly configure the audio pipeline
 
-### Affected devices
 
-This issue affects multiple Lenovo laptop models with the ALC3306 codec:
-
-| Model | Codec Subsystem ID | Status |
-|-------|-------------------|--------|
-| Legion Pro 7 16IAX10H | `17aa:3906` | ❌ Broken - extremely low volume |
-| Yoga Pro 9 16IAH10 | `17aa:391f` | ❌ Broken - extremely low volume |
-| Yoga Pro 9 14IRP8 | `17aa:38bf` | ❌ Broken - extremely low volume |
-| Yoga Pro 7 14ASP9 | `17aa:3903` | ✅ Works normally |
-| Yoga 7 14AKP10 | `17aa:391c` | ❌ Broken - extremely low volume |
-
-### The above is somewhat speculative
-
-Could be something else! What do I know? Since when do I know how Linux audio drivers work?!
+**The above is somewhat speculative**. Could be something else! What do I know? Since when do I know how Linux audio drivers work?!
 
 ## Where this is being discussed
 
@@ -89,7 +77,6 @@ Additionally, [here are some debugging tools for testing HDA verbs on Linux](htt
 - The AW88399 amps need I2C initialization commands, not just HDA verbs.
 - The QEMU toolchain being unmaintained is a bad sign.
 
-
 ## Things that absolutely do not work
 
 - [Completely useless](https://github.com/aenawi/lenovo-legion-linux-audio)
@@ -97,19 +84,8 @@ Additionally, [here are some debugging tools for testing HDA verbs on Linux](htt
 - `options snd-hda-intel model=alc287-yoga9-bass-spk-pin`
 - Switching to SOF drivers
 
-## What can be done?
-
-I don't know,
-
-- Learn how kernel sound drivers work?
-- Adapt an existing quirk (e.g. `alc287-yoga9-bass-spk-pin`) to make it work?
-- Reverse engineer the Windows driver, record the HDA verbs being sent across I2C, and port that to Linux?
-- Nag?
-
-## Offer: I will fund a kernel developer to fix this
-
-Submit a patch that works and I'll donate to your favorite charity. I mean it. I don't know how much. Two hundred dollars? I'm not exactly drowning in money. I can help you test via my hardware.
-
 ## Are you also having this problem???
 
-If so, please yell loudly at my general direction! Try to raise it up on kernel audio mailing lists! Respond to this [kernel.org Bugzilla discussion I'm trying to be active in](https://bugzilla.kernel.org/show_bug.cgi?id=218329)! Participate in increasing the amount in my above charity donation pledge!
+If so, please yell loudly at my general direction! Try to raise it up on kernel audio mailing lists! Respond to this [kernel.org Bugzilla discussion I'm trying to be active in](https://bugzilla.kernel.org/show_bug.cgi?id=218329)!
+
+**You can also participate in the bug bounty pledge by sending a pull request to this `README.md` file adding your amount above.**
