@@ -51,7 +51,30 @@ sudo make -j24 modules_install
 sudo cp -f arch/x86/boot/bzImage /boot/vmlinuz-linux-16iax10h-audio
 ```
 
-## Step 6: Generate the initramfs
+## Step 6: Install NVidia DKMS Drivers
+
+To ensure proper graphics integration, you'll need to install the NVidia DKMS drivers for your custom kernel.
+
+### Arch Linux (Tested)
+
+Install the NVidia DKMS package and headers:
+
+```bash
+sudo pacman -S nvidia-open-dkms
+```
+
+The DKMS system will automatically build the NVidia kernel modules for your custom kernel. After installation, reboot to load the new drivers.
+
+In case you later need to recompile and reinstall the driver, use the `dkms` utility:
+
+```bash
+sudo dkms build nvidia/580.105.08 --force
+sudo dkms install nvidia/580.105.08 --force
+```
+
+You may need to replace `580.105.08` with the actual NVidia driver version.
+
+## Step 7: Generate the initramfs
 
 The process differs between distributions, as some use `dracut` while others use `mkinitcpio`. Instructions for common distributions are provided below.
 
@@ -125,11 +148,11 @@ Replace `your-root-partition-uuid` with your actual root partition UUID (find it
 
 **Note:** You must include `snd_intel_dspcfg.dsp_driver=3` in your kernel boot parameters.
 
-## Step 7: Reboot into the Patched Kernel
+## Step 8: Reboot into the Patched Kernel
 
 Reboot into the patched kernel. After rebooting, run `uname -a` to verify that you're running the correct kernel.
 
-## Step 8: Install the Patched ALSA UCM2 Configuration
+## Step 9: Install the Patched ALSA UCM2 Configuration
 
 This step is necessary for proper volume control.
 
@@ -163,29 +186,6 @@ amixer sset -c 0 Speaker 100%
 ```
 
 **Note:** The last three commands are for speaker calibration, not for setting your volume to maximum. They must be run for the speakers to function properly, but they do not control your actual volume level.
-
-## Step 9: Install NVidia DKMS Drivers
-
-To ensure proper graphics integration, you'll need to install the NVidia DKMS drivers for your custom kernel.
-
-### Arch Linux (Tested)
-
-Install the NVidia DKMS package and headers:
-
-```bash
-sudo pacman -S nvidia-open-dkms
-```
-
-The DKMS system will automatically build the NVidia kernel modules for your custom kernel. After installation, reboot to load the new drivers.
-
-In case you need to recompile and reinstall the driver, use the `dkms` utility:
-
-```bash
-sudo dkms build nvidia/580.105.08 --force
-sudo dkms install nvidia/580.105.08 --force
-```
-
-You may need to replace `580.105.08` with the actual NVidia driver version.
 
 ## Step 10: Enjoy Working Audio!
 
